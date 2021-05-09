@@ -1,0 +1,29 @@
+﻿@model List<WebApplication2.Models.ViewModels.GeneroGrillaViewModel>
+
+<div>
+    <div style="text-align:right">
+        <a class="btn btn-primary" href="/Genero/Create">Crear</a>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Comandos</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Nombre</td>
+                    <td>
+                        <a href="/Genero/Edit/@item.Id" class="btn">Editar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>

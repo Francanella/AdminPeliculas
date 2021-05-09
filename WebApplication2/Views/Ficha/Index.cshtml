@@ -1,0 +1,127 @@
+﻿@model List<WebApplication2.Models.ViewModels.SelectBoxITemViewModel>
+
+@using (Html.BeginForm("Create", "Pelicula", FormMethod.Post, new { @id = "form" }))
+{
+
+    <div>
+        <label>Genero</label>
+        <select id="Genero" name="Genero" class="form-control">
+            <option value="@Guid.Empty">Seleccione una opción</option>
+            @foreach (var item in Model)
+            {
+                <option value="@item.Id">@item.Texto</option>
+            }
+        </select>
+
+    </div>
+
+    <div id="select_div">
+
+    </div>
+
+    <div id="div">
+
+    </div>
+
+
+
+    @section Scripts {
+
+
+        <script type="text/javascript">
+
+            $(document).ready(function () {
+
+                function mostrarPelis(pelis) {
+                    var select = '<label>Peliculas</label><select id="pelicula" class="form-control">';
+                    select += '<option value="@Guid.Empty">Seleccione una opción</option>';
+                    for (let i = 0; i < pelis.length; i++) {
+                        select += '<option value=' + pelis[i].Id + '>' + pelis[i].Texto + '</option>';
+                    }
+                    select += '</select>';
+
+                    $("#select_div").html(select);
+                }
+
+                
+                function generarFicha(peli) {
+
+                    var div = '<br><br><div id= "ficha" class="row" style="border-radius:10px 10px; font-family:Agency FB; background-color:#DCDCDC"><div align="center"><img class="col-md-2 center" src="' + peli.urlImage + '" style="width: 70%;max-width: 300px; margin-top:2%">';
+
+                    div += '<div align="left" <h1  style="font-size:500%;"><strong>' + peli.Nombre +'</strong></h1></div>'; 
+
+                    div += '<div class="col-md-1 center "><h4 style="font-size:250%;">Genero</h4>';
+                    div += '<h5 style="font-size:150%;">' + peli.Genero + '</h5></div>';
+
+                    div += '<div class="col-md-3 left"><h4 style="font-size:250%;">Fecha de Estreno</h4>';
+                    div += '<h5 style="font-size:150%;"> ' + peli.FechaEstreno + '</h5 ></div >';
+
+                    div += '<div class="col-md-1 center"><h4 style="font-size:250%;">Duracion</h4>';
+                    div += '<h5 style="font-size:150%;">' + peli.Duracion + ' min </h5></div > ';
+
+                    div += '<div class="col-md-3 right"><h4 style="font-size:250%;">Actores</h4>';
+                    div += '<h5 style="font-size:150%">';
+
+                    for (let i = 0; i < peli.Actores.length; i++) {
+                        div += '<p>'+ peli.Actores[i] + '</p>';
+                    }
+
+                    div += '</h5></div>';
+
+                    div += '<div class="col-md-1 "<h4 style="font-size:250%">Sinopsis</h4></div>';
+
+                    div += '<div align="left" class="col-md-8 " style="font-size:150%"><p>'+peli.Sinopsis+'</p></div>';
+
+                    $("#div").html(div);
+                }
+
+
+
+                $("#Genero").change(function () {
+                    var generoSeleccionado = $(this).val();
+
+                    $.ajax({
+                        type: "GET",
+                        url: "/Ficha/getPelisByGenero",
+                        data: { id: generoSeleccionado },
+                        success: function (pelis) {
+                            mostrarPelis(pelis);
+                            habilitarSelect();
+                        },
+                        error: function (data) {
+                            console.log(data);
+                        },
+                    });
+                })
+
+
+                function habilitarSelect() {
+
+                    $("#pelicula").change(function () {
+                        var peliSeleccionada = $(this).val();
+
+                        $.ajax({
+                            type: "GET",
+                            url: "/Ficha/getPeli",
+                            data: { id: peliSeleccionada },
+                            success: function (peli) {
+                               generarFicha(peli);
+                               console.log(peli);
+                            },
+                            error: function (data) {
+                                console.log(data);
+                            },
+                        });
+                    })
+
+                }
+
+                
+
+
+            })
+
+
+        </script>
+    }
+}

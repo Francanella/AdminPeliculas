@@ -1,0 +1,201 @@
+﻿@model List<WebApplication2.Models.ViewModels.SelectBoxITemViewModel>
+
+<div class="container" style="margin-top:20px">
+    <div class="col-md-6">
+        <input class="form-control" id="name" placeholder="Busca por nombre" />
+    </div>
+    <div class="col-md-6">
+        <select class="form-control" id="genero">
+            <option value="">-</option>
+            @foreach (var genero in Model)
+            {
+                <option value="@genero.Id">@genero.Texto</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-12" style="margin-top:20px">
+        <button class="btn btn-primary" id="filtrar">Filtrar!</button>
+    </div>
+</div>
+
+<div>
+    <div style="text-align:right">
+        <a class="btn btn-primary" href="/Pelicula/Create">Crear</a>
+    </div>
+
+    <table id="table" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Genero</th>
+                <th>Duracion</th>
+                <th>Fecha de Estreno</th>
+                <th>Actores</th>
+                <th>Comandos</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+
+@section Scripts {
+    <script src="~/Content/Datatables/datatables.min.js"></script>
+    <link href="~/Content/Datatables/datatables.css" rel="stylesheet" />
+    <script src="~/Content/sweetAlert/sweetalert.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            var nombre = "";
+            var genero = null;
+
+            //FILTER RELATED FUNCTIONS
+            $("#filtrar").click(function () {
+                nombre = $("#name").val();
+                genero = $("#genero").val();
+                RefreshTable();
+            })
+            //END FILTER RELATED FUNCTIONS
+
+            //TABLE RELATED FUNCTIONS
+            function RefreshTable() {
+                table.ajax.reload();
+            }
+
+            function EliminarPelicula(id) {
+                 $.ajax({
+                    type: "POST",
+                    url: "/Pelicula/Delete",
+                    data: { id: id },
+                     success: function (data) {
+                         RefreshTable();
+                    },
+                    error: function (data) {
+                         console.log("ERROR!");
+                    },
+                });
+            }
+
+            function EstasSeguro(id) {
+                swal({
+                    title: "Queres eliminar esta pelicula?",
+                    text: "Cuidado! Si la eliminás no podés recuperarla!",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                })
+                .then((willDelete) => {
+                  if (willDelete) {
+                      EliminarPelicula(id);
+                  }
+                });
+            }
+
+            function RefrescarClicksDelete() {
+                $(".btn_delete").off();
+                $(".btn_delete").click(function () {
+                    var id_seleccionado = $(this).attr('id');
+                    EstasSeguro(id_seleccionado);
+                });
+            }
+
+              var table = $("#table").DataTable(
+                  {
+                    language: {
+                    "sProcessing": "Procesando...",
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sZeroRecords": "No se encontraron resultados",
+                    "sEmptyTable": "Ningún dato disponible en esta tabla",
+                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sSearch": "Buscar:",
+                    "sUrl": "",
+                    "sInfoThousands": ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst": "Primero",
+                        "sLast": "Último",
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                },
+                "searching": false,
+                "processing": true,
+                "serverSide": true,
+                "ajax":
+                    {
+                        "url": '@Url.Action("GetData", "Pelicula")',
+                        "type": "POST",
+                        "data": function (d) {
+                            d.nombre = nombre;
+                            d.genero = genero;
+                        }
+                    },
+                "columns": [
+                    {
+                        "data": "Nombre",
+                        "searchable": true,
+                        "orderable":true
+                    },
+                    {
+                        "data": "Genero",
+                        "searchable": true,
+                        "orderable": true
+                    },
+                    {
+                        "data": "Duracion",
+                        "searchable": true,
+                        "orderable": true
+                    },
+                     {
+                        "data": "FechaEstreno",
+                        "searchable": true,
+                        "orderable": true
+                    },
+                     {
+                        "searchable": false,
+                        "orderable": false,
+                        "mRender": function (data, type, row) {
+
+                            var html = "<ul>";
+
+                            for (var i = 0; i < row.Actores.length; i++) {
+                                html += '<li>' + row.Actores[i] + '</li>';
+                            }
+
+                            html += "</ul>";
+
+                            return html;
+                        }
+                    },
+                    {
+                        "searchable": false,
+                        "orderable": false,
+                        "mRender": function (data, type, row) {
+
+                            var html = '<a href="/Pelicula/Edit/' + row.Id + '" class="btn">Editar</a>'
+                            html += '<button id="' + row.Id + '" class="btn btn-danger btn_delete">Eliminar</button>'
+
+                            return html;
+                        }
+                    }
+                ],
+                "drawCallback": function (settings, json) {
+                    console.log('draw!');
+                    RefrescarClicksDelete();
+                }
+
+                }
+            );
+            //END TABLE RELATED FUNCTIONS
+        });
+    </script>
+
+}

@@ -1,0 +1,225 @@
+﻿@model WebApplication2.Models.ViewModels.EstadisticasViewModel
+
+<div>
+    <h1 class="titulo">Cantidad de Peliculas</h1>
+
+    <div>
+        <h1 style="font-size:700%;
+                   text-align:center;
+                   border-radius:10px 10px;
+                   font-family:Agency FB;
+                   background-color:#DCDCDC">
+
+            <strong>@Model.CantidadPeliculas</strong>
+        </h1>
+    </div>
+
+    <h1 class="titulo">Pelicula con mas Actores</h1>
+
+    <div style="text-align:right">
+        <a class="btn btn-primary" href="/Pelicula/Edit/@Model.PeliConMasActores.Id">Editar</a>
+    </div>
+
+
+    <div class="row" ; style="border-radius:10px 10px;
+                             font-family:Agency FB;
+                             background-color:#DCDCDC">
+
+        <div align="center">
+
+            <img class="col-md-2 center" src="@Model.PeliConMasActores.urlImage" style="width: 70%;
+                                                                                                            max-width: 300px;
+                                                                                                            margin-top:2%;
+                                                                                                            border-radius:30px 30px">
+
+            <div align="left">
+                <h1 style="font-size:500%;"><strong>@Model.PeliConMasActores.Nombre</strong></h1>
+            </div>
+
+            <div class="col-md-1 center ">
+                <h4 style="font-size:250%;">Genero</h4>
+                <h5 style="font-size:150%;">@Model.PeliConMasActores.Genero</h5>
+            </div>
+
+            <div class="col-md-3 left">
+                <h4 style="font-size:250%;">Fecha de Estreno</h4>
+                <h5 style="font-size:150%;">@Model.PeliConMasActores.FechaEstreno</h5>
+            </div>
+
+            <div class="col-md-1 center">
+                <h4 style="font-size:250%;">Duracion</h4>
+                <h5 style="font-size:150%;">@Model.PeliConMasActores.Duracion</h5>
+            </div>
+
+            <div class="col-md-3 right">
+                <h4 style="font-size:250%;">Actores</h4>
+                <h5 style="font-size:150%">
+
+                    @foreach (var actor in Model.PeliConMasActores.Actores)
+                    {
+                        @actor<br>;
+                    }
+
+                </h5>
+            </div>
+
+            <div class="col-md-1 ">
+                <h4 style="font-size:250%">Sinopsis</h4>
+            </div>
+
+            <div align="left" class="col-md-8 " style="font-size:150%">
+                <p>@Model.PeliConMasActores.Sinopsis</p>
+            </div>
+
+        </div>
+    </div>
+
+    <div>
+        <h1 class="titulo">
+            Peliculas con @Model.DosActores.NombreActorUno y @Model.DosActores.NombreActorDos
+        </h1>
+
+        <table class="table table-striped">
+            <thead class="texto_th">
+                <tr>
+                    <th>Película</th>
+                    <th>@Model.DosActores.NombreActorUno</th>
+                    <th>@Model.DosActores.NombreActorDos</th>
+                </tr>
+            </thead>
+            <tbody class="texto_tb">
+                @foreach (var item in Model.DosActores.PelisActorUnoYDos)
+                {
+                    <tr>
+                        <td>@item</td>
+                        <td>@(Model.DosActores.PelisActorUno.Contains(item) ? Html.Raw("&#10004") : Html.Raw(""))</td>
+                        <td>@(Model.DosActores.PelisActorDos.Contains(item) ? Html.Raw("&#10004") : Html.Raw("")) </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+
+<link href="~/Content/Estadisticas/Estadistica.css" rel="stylesheet" />
+
+<div id="container"></div>
+
+<div id="container2"></div>
+
+@section Scripts {
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/series-label.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            function graficar(data) {
+                Highcharts.chart('container', {
+
+                    title: {
+                        text: data.title
+                    },
+                    yAxis: {
+                        title: {
+                            text: data.subtitle
+                        }
+                    },
+                    xAxis: {
+                        categories: data.categories,
+                    },
+                    series: data.series,
+
+                    responsive: {
+                        rules: [{
+                            condition: {
+                                maxWidth: 500
+                            },
+                            chartOptions: {
+                                legend: {
+                                    layout: 'horizontal',
+                                    align: 'center',
+                                    verticalAlign: 'bottom'
+                                }
+                            }
+                        }]
+                    }
+
+                });
+            }
+
+            function llamada() {
+                $.ajax({
+                    type: "GET",
+                    url: "/Estadisticas/GetGraficosEstrenosGenerosPorAño",
+                    success: function (data) {
+                        graficarTorta(data);
+                    },
+                    error: function (data) {
+                        console.log(data);
+                    },
+                });
+            }
+
+            $.ajax({
+                type: "GET",
+                url: "/Estadisticas/GetGraficoEstrenoPeliculas",
+                success: function (data) {
+                    graficar(data);
+                    llamada();
+                },
+                error: function (data) {
+                    console.log(data);
+                },
+            });
+
+
+            function graficarTorta(data) {
+                Highcharts.chart('container2', {
+                    chart: {
+                        plotBackgroundColor: null,
+                        plotBorderWidth: null,
+                        plotShadow: false,
+                        type: 'pie'
+                    },
+                    title: {
+                        text: data.title
+                    },
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                    },
+                    accessibility: {
+                        point: {
+                            valueSuffix: '%'
+                        }
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true,
+                                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                            }
+                        }
+                    },
+                    series: [{
+                        name: 'Porcentaje',
+                        ColorByPoint: true,
+                        data: data.series
+                    }]
+                });
+            }
+        });
+        
+
+    </script>
+
+}

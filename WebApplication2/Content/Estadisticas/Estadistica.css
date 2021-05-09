@@ -1,0 +1,15 @@
+﻿.titulo {
+    font-size: 330%;
+    color: #FFFFFF;
+    border-radius: 10px 10px;
+    font-family: Agency FB;
+    background-color: #6e6e6e
+}
+.texto_th {
+    font-size: 250%;
+    font-family: Agency FB;
+}
+.texto_tb {
+    font-size: 150%;
+    font-family: Agency FB;
+}

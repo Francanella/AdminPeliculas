@@ -1,0 +1,47 @@
+﻿@model List<WebApplication2.Models.ViewModels.PeliculaGrillaViewModel>
+
+<div>
+    <div style="text-align:right">
+        <a class="btn btn-primary" href="/Pelicula/Create">Crear</a>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Genero</th>
+                <th>Duracion</th>
+                <th>Fecha de Estreno</th>
+                <th>Actores</th>
+                <th>Comandos</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Nombre</td>
+                    <td>@item.Genero</td>
+                    <td>@item.Duracion</td>
+                    <td>@item.FechaEstreno</td>
+                    <td>
+                        <ul>
+                            @foreach (var actor in item.Actores)
+                            {
+                                <li>@actor</li>
+                            }
+                        </ul>
+                    </td>
+                    <td>
+                        <a href="/Pelicula/Edit/@item.Id" class="btn">Editar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div>
+        <a href="/Pelicula/CrearExcel" class="btn btn-primary">Descargar excel</a>
+    </div>
+
+</div>

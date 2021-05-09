@@ -1,0 +1,56 @@
+﻿@model WebApplication2.Models.ViewModels.PeliculaABMViewModel
+
+@using (Html.BeginForm("Edit", "Pelicula", FormMethod.Post, new { @id = "form" }))
+{
+    @Html.HiddenFor(m => m.Id)
+
+    <div>
+        <label>Genero</label>
+        <select id="GeneroSeleccionado" name="GeneroSeleccionado" class="form-control">
+            <option value="@Guid.Empty">Seleccione una opción</option>
+            @foreach (var item in Model.GenerosDisponibles)
+            {
+                <option @(Model.GeneroSeleccionado == item.Id ? "selected" : "") value="@item.Id">@item.Texto</option>
+            }
+        </select>
+        <span style="color:red">@Html.ValidationMessageFor(g => g.GeneroSeleccionado)</span>
+
+    </div>
+
+
+    <div>
+        <label>Nombre</label>
+        <input class="form-control" type="text" id="Nombre" name="Nombre" value="@Model.Nombre" />
+        <span style="color:red">@Html.ValidationMessageFor(m => m.Nombre)</span>
+    </div>
+    <div>
+        <label>Duracion</label>
+        <input class="form-control" type="number" id="Duracion" name="Duracion" value="@Model.Duracion" />
+        <span style="color:red">@Html.ValidationMessageFor(m => m.Duracion)</span>
+
+    </div>
+    <div>
+        <label>Fecha de Estreno</label>
+        <input id="FechaEstreno" name="FechaEstreno" type="date" class="form-control" value="@(Model.FechaEstreno.HasValue ? Model.FechaEstreno.Value.ToString("yyyy-MM-dd"): "")" />
+        <span style="color:red">@Html.ValidationMessageFor(m => m.FechaEstreno)</span>
+
+    </div>
+
+    <div>
+        <label>Actores</label>
+        <select multiple id="ActoresSeleccionados" name="ActoresSeleccionados" class="form-control">
+            <option value="@Guid.Empty">Seleccione una opción</option>
+            @foreach (var item in Model.ActoresDisponibles)
+            {
+                <option @(Model.ActoresSeleccionados.Any(c => c == item.Id) ? "selected" : "") value="@item.Id">@item.Texto</option>
+            }
+        </select>
+        <span style="color:red">@Html.ValidationMessageFor(m => m.ActoresSeleccionados)</span>
+
+    </div>
+
+
+  <div>
+      <button>Guardar </button>
+  </div>
+ }

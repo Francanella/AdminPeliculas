@@ -1,0 +1,20 @@
+﻿@model WebApplication2.Models.ViewModels.GeneroABMViewModel
+
+@using (Html.BeginForm("Edit", "Genero", FormMethod.Post, new { @id = "form" }))
+{
+
+    <div>
+        <label>Nombre</label>
+        <input class="form-control" type="text" id="Nombre" name="Nombre" value="@Model.Nombre" />
+        <span style="color:red">@Html.ValidationMessageFor(m => m.Nombre)</span>
+    </div>
+
+    <div>
+        <label id="GeneroSeleccionado" name="GeneroSeleccionado" value="@Model.GeneroSeleccionado"></label>
+        <span style="color:red">@Html.ValidationMessageFor(m => m.GeneroSeleccionado)</span>
+    </div>
+
+    <div>
+        <button>Guardar </button>
+    </div>
+}
